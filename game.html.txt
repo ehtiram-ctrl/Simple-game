@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sadə Oyun</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            background-color: #ffffff;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: black;
+            font-size: 24px;
+        }
+
+        .button {
+            position: absolute;
+            padding: 10px;
+            color: white;
+            background-color: #333;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<div class="info" id="goldAmount">Altın: 0</div>
+<button class="button" id="warriorButton" style="top: 500px; left: 50px;">Barbar: 1000 Altın</button>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let gold = 0;
+    const goldPerHour = 100;
+
+    const mainBuilding = { x: 200, y: 300, width: 100, height: 100 };
+    const archerTower = { x: 350, y: 250, width: 50, height: 50 };
+    const defensiveBuilding = { x: 500, y: 300, width: 50, height: 50 };
+    const goldDeposit = { x: 100, y: 500, width: 50, height: 50 };
+    const market = { x: 650, y: 500, width: 100, height: 50 };
+    const warriorButton = { x: 50, y: 500, width: 100, height: 50 };
+
+    const warriorCost = 1000;
+
+    let warriorPurchased = false;
+
+    function drawGameObjects() {
+        ctx.fillStyle = '#A9A9A9'; // Gray
+        ctx.fillRect(mainBuilding.x, mainBuilding.y, mainBuilding.width, mainBuilding.height);
+        ctx.fillRect(archerTower.x, archerTower.y, archerTower.width, archerTower.height);
+        ctx.fillRect(defensiveBuilding.x, defensiveBuilding.y, defensiveBuilding.width, defensiveBuilding.height);
+
+        ctx.fillStyle = '#FFD700'; // Gold
+        ctx.fillRect(goldDeposit.x, goldDeposit.y, goldDeposit.width, goldDeposit.height);
+
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(market.x, market.y, market.width, market.height);
+
+        if (!warriorPurchased) {
+            ctx.strokeRect(warriorButton.x, warriorButton.y, warriorButton.width, warriorButton.height);
+        }
+    }
+
+    function updateGold() {
+        gold += goldPerHour / 60;  // hər dəqiqədə altın artır
+        document.getElementById('goldAmount').textContent = `Altın: ${Math.floor(gold)}`;
+    }
+
+    function handleClick(event) {
+        const mouseX = event.offsetX;
+        const mouseY = event.offsetY;
+
+        // Barbar düyməsi
+        if (!warriorPurchased && mouseX > warriorButton.x && mouseX < warriorButton.x + warriorButton.width &&
+            mouseY > warriorButton.y && mouseY < warriorButton.y + warriorButton.height) {
+            if (gold >= warriorCost) {
+                warriorPurchased = true;
+                gold -= warriorCost;
+                document.getElementById('warriorButton').textContent = "Barbar Alındı";
+            }
+        }
+    }
+
+    canvas.addEventListener('click', handleClick);
+
+    function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Ekranı təmizlə
+
+        drawGameObjects();
+        updateGold();
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+</script>
+
+</body>
+</html>
